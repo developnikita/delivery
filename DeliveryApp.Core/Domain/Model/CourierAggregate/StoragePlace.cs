@@ -6,6 +6,8 @@ namespace DeliveryApp.Core.Domain.Model.CourierAggregate
 {
     public class StoragePlace : Entity<Guid>
     {
+        public static StoragePlace Bag => new("Сумка", 10);
+
         [ExcludeFromCodeCoverage]
         private StoragePlace() { }
 
