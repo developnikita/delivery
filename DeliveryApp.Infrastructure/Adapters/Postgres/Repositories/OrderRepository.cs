@@ -19,10 +19,11 @@ namespace DeliveryApp.Infrastructure.Adapters.Postgres.Repositories
             await _dbContext.Orders.AddAsync(order);
         }
 
-        public IEnumerable<Order> GetAllInAssignedStatus()
+        public async Task<IEnumerable<Order>> GetAllInAssignedStatus()
         {
-            var orders = _dbContext.Orders
-                                   .Where(o => o.Status.Name == OrderStatus.Assigned.Name);
+            var orders = await _dbContext.Orders
+                                   .Where(o => o.Status.Name == OrderStatus.Assigned.Name)
+                                   .ToArrayAsync();
             return orders;
 
         }

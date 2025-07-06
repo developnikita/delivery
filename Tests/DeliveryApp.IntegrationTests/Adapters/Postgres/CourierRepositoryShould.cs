@@ -100,15 +100,15 @@ namespace DeliveryApp.IntegrationTests.Adapters.Postgres
             var order = Order.Create(Guid.NewGuid(), orderLocation, 3).Value;
 
             couriers[2].TakeOrder(order);
-            
-            foreach(var c in couriers)
+
+            foreach (var c in couriers)
             {
                 await _courierRepository.AddAsync(c);
             }
             await _unitOfWork.SaveChangesAsync();
 
             // Act
-            var freeCouriers = _courierRepository.GetAllFree();
+            var freeCouriers = await _courierRepository.GetAllFree();
 
             // Assert
             freeCouriers.Count().Should().Be(2);

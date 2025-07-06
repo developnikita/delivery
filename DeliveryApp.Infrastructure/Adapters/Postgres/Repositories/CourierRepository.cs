@@ -19,11 +19,12 @@ namespace DeliveryApp.Infrastructure.Adapters.Postgres.Repositories
             await _dbContext.Couriers.AddAsync(courier);
         }
 
-        public IEnumerable<Courier> GetAllFree()
+        public async Task<IEnumerable<Courier>> GetAllFree()
         {
-            var couriers = _dbContext.Couriers
+            var couriers = await _dbContext.Couriers
                                      .Include(x => x.StoragePlaces)
-                                     .Where(o => o.StoragePlaces.All(c => c.OrderId == null));
+                                     .Where(o => o.StoragePlaces.All(c => c.OrderId == null))
+                                     .ToArrayAsync();
             return couriers;
         }
 

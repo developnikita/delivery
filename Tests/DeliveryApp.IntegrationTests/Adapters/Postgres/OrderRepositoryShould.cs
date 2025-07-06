@@ -132,7 +132,7 @@ namespace DeliveryApp.IntegrationTests.Adapters.Postgres
             await _unitOfWork.SaveChangesAsync();
 
             // Act
-            var orders = _orderRepository.GetAllInAssignedStatus();
+            var orders = await _orderRepository.GetAllInAssignedStatus();
 
             // Assert
             orders.Count().Should().Be(1);
