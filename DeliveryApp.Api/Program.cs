@@ -1,5 +1,9 @@
 using DeliveryApp.Api;
 using DeliveryApp.Core.Domain.Services.DispatchService;
+using DeliveryApp.Core.Ports;
+using DeliveryApp.Infrastructure.Adapters.Postgres;
+using DeliveryApp.Infrastructure.Adapters.Postgres.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +24,10 @@ builder.Services.AddCors(options =>
 builder.Services.ConfigureOptions<SettingsSetup>();
 var connectionString = builder.Configuration["CONNECTION_STRING"];
 
+builder.Services.AddDbContext<ApplicationDbContext>(option => option.UseNpgsql(connectionString));
 builder.Services.AddScoped<IDispatchService, DispatchService>();
+builder.Services.AddScoped<ICourierRepository, CourierRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
 var app = builder.Build();
 
