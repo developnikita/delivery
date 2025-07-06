@@ -13,5 +13,7 @@ namespace DeliveryApp.Core.Ports
         Task<Maybe<Courier>> GetAsync(Guid courierId);
 
         Task<IEnumerable<Courier>> GetAllFree();
+
+        Task<IEnumerable<Courier>> GetAllBusy();
     }
 }
