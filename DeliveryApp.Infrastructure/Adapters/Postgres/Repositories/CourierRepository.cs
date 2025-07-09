@@ -28,6 +28,15 @@ namespace DeliveryApp.Infrastructure.Adapters.Postgres.Repositories
             return couriers;
         }
 
+        public async Task<IEnumerable<Courier>> GetAllBusy()
+        {
+            var couriers = await _dbContext.Couriers
+                                        .Include(x => x.StoragePlaces)
+                                        .Where(o => o.StoragePlaces.Any(c => c.OrderId != null))
+                                        .ToArrayAsync();
+            return couriers;
+        }
+
         public async Task<Maybe<Courier>> GetAsync(Guid courierId)
         {
             var courier = await _dbContext.Couriers
