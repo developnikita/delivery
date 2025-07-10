@@ -12,7 +12,7 @@ namespace DeliveryApp.Core.Application.UseCases.Queries.GetCreatedAndAssignedOrd
 
         public GetCreatedAndAssignedOrdersHandler(string connectionString)
         {
-            _connectionString = !string.IsNullOrWhiteSpace(_connectionString)
+            _connectionString = !string.IsNullOrWhiteSpace(connectionString)
                                 ? connectionString
                                 : throw new ArgumentNullException(nameof(connectionString));
         }

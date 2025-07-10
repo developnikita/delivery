@@ -2,35 +2,32 @@
 using MediatR;
 using Npgsql;
 
-namespace DeliveryApp.Core.Application.UseCases.Queries.GetBusyCouriers
+namespace DeliveryApp.Core.Application.UseCases.Queries.GetCouriers
 {
-    public class GetBusyCouriersHandler : IRequestHandler<GetBusyCouriersQuery, GetBusyCouriersModel>
+    public class GetCouriersHandler : IRequestHandler<GetCouriersQuery, GetCouriersModel>
     {
         private readonly string _connectionString;
 
-        public GetBusyCouriersHandler(string connectionString)
+        public GetCouriersHandler(string connectionString)
         {
             _connectionString = !string.IsNullOrWhiteSpace(connectionString)
                                 ? connectionString
                                 : throw new ArgumentNullException(nameof(connectionString));
         }
 
-        public async Task<GetBusyCouriersModel> Handle(GetBusyCouriersQuery request, CancellationToken cancellationToken)
+        public async Task<GetCouriersModel> Handle(GetCouriersQuery request, CancellationToken cancellationToken)
         {
             using var connection = new NpgsqlConnection(_connectionString);
             connection.Open();
 
             var result = await connection.QueryAsync<dynamic>(
-                @"SELECT c.id as courier_id, c.name, c.location_x, c.location_y
-                  FROM public.couriers as c
-                  LEFT JOIN public.storage_places as sp on c.id = sp.courier_id
-                  WHERE sp.order_id NOT NULL",
-                new {});
+                @"SELECT id, name, location_x, location_y FROM public.couriers",
+                new { });
 
             if (result.AsList().Count == 0)
                 return null;
 
-            return new GetBusyCouriersModel([.. result.Select(MapCourier)]);
+            return new GetCouriersModel([.. result.Select(MapCourier)]);
         }
 
         private Courier MapCourier(dynamic courier)
@@ -43,7 +40,7 @@ namespace DeliveryApp.Core.Application.UseCases.Queries.GetBusyCouriers
 
             var c = new Courier
             {
-                Id = courier.courier_id,
+                Id = courier.id,
                 Name = courier.name,
                 Location = location
             };

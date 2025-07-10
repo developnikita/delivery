@@ -21,6 +21,10 @@ namespace DeliveryApp.Infrastructure.Adapters.Postgres.EntityConfigurations.Orde
                    .HasColumnName("courier_id")
                    .IsRequired(false);
 
+            builder.Property(entity => entity.Volume)
+                    .HasColumnName("volume")
+                    .IsRequired(true);
+
             builder.OwnsOne(entity => entity.Status, a =>
                    {
                        a.Property(c => c.Name).HasColumnName("status").IsRequired();
