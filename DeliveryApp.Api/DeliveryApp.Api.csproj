@@ -45,6 +45,6 @@
         <ProjectReference Include="..\DeliveryApp.Infrastructure\DeliveryApp.Infrastructure.csproj" />
     </ItemGroup>
     <ItemGroup>
-      <Folder Include="Adapters\Http\" />
+      <Folder Include="Adapters\Http\Contract\" />
     </ItemGroup>
 </Project>
