@@ -10,17 +10,22 @@ namespace DeliveryApp.Core.Application.UseCases.Commands.CreateOrder
     {
         private readonly IOrderRepository _orderRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IGeoClient _geoService;
 
-        public CreateOrderHandler(IOrderRepository orderRepository, IUnitOfWork unitOfWork)
+        public CreateOrderHandler(IOrderRepository orderRepository, IUnitOfWork unitOfWork, IGeoClient geoService)
         {
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            _geoService = geoService;
         }
 
         public async Task<bool> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
         {
             // NOTE: Не получаем вес заказа из команды.
-            var orderCreatedResult = Order.Create(request.BasketId, Location.CreateRandom(), 1);
+            var location = await _geoService.GetLocationAsync(request.Street, cancellationToken);
+            if (location.IsFailure)
+                return false;
+            var orderCreatedResult = Order.Create(request.BasketId, location.Value, 1);
             if (orderCreatedResult.IsFailure)
                 return false;
 
