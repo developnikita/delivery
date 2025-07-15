@@ -21,11 +21,10 @@ namespace DeliveryApp.Core.Application.UseCases.Commands.CreateOrder
 
         public async Task<bool> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
         {
-            // NOTE: Не получаем вес заказа из команды.
             var location = await _geoService.GetLocationAsync(request.Street, cancellationToken);
             if (location.IsFailure)
                 return false;
-            var orderCreatedResult = Order.Create(request.BasketId, location.Value, 1);
+            var orderCreatedResult = Order.Create(request.BasketId, location.Value, request.Volume);
             if (orderCreatedResult.IsFailure)
                 return false;
 
