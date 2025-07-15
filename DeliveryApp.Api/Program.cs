@@ -9,6 +9,7 @@ using DeliveryApp.Core.Application.UseCases.Queries.GetCouriers;
 using DeliveryApp.Core.Application.UseCases.Queries.GetCreatedAndAssignedOrders;
 using DeliveryApp.Core.Domain.Services.DispatchService;
 using DeliveryApp.Core.Ports;
+using DeliveryApp.Infrastructure.Adapters.Grpc.GeoService;
 using DeliveryApp.Infrastructure.Adapters.Postgres;
 using DeliveryApp.Infrastructure.Adapters.Postgres.Repositories;
 using MediatR;
@@ -71,6 +72,9 @@ builder.Services.AddScoped<IRequestHandler<GetBusyCouriersQuery, GetBusyCouriers
     _ => new GetBusyCouriersHandler(connectionString));
 builder.Services.AddScoped<IRequestHandler<GetCouriersQuery, GetCouriersModel>, GetCouriersHandler>(
     _ => new GetCouriersHandler(connectionString));
+
+// Grpc
+builder.Services.AddScoped<IGeoClient, Client>();
 
 // HTTP Handlers
 builder.Services.AddControllers(options => { options.InputFormatters.Insert(0, new InputFormatterStream()); })
