@@ -1,5 +1,6 @@
 using DeliveryApp.Api;
 using DeliveryApp.Api.Adapters.BackgroundJobs;
+using DeliveryApp.Api.Adapters.Kafka.BasketConfirmedService;
 using DeliveryApp.Core.Application.UseCases.Commands.AssignOrder;
 using DeliveryApp.Core.Application.UseCases.Commands.CreateCourier;
 using DeliveryApp.Core.Application.UseCases.Commands.CreateOrder;
@@ -75,6 +76,14 @@ builder.Services.AddScoped<IRequestHandler<GetCouriersQuery, GetCouriersModel>, 
 
 // Grpc
 builder.Services.AddScoped<IGeoClient, Client>();
+
+// Kafka Consumer
+builder.Services.Configure<HostOptions>(options =>
+{
+    options.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.Ignore;
+    options.ShutdownTimeout = TimeSpan.FromSeconds(30);
+});
+builder.Services.AddHostedService<ConsumerService>();
 
 // HTTP Handlers
 builder.Services.AddControllers(options => { options.InputFormatters.Insert(0, new InputFormatterStream()); })

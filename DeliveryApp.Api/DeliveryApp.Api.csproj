@@ -11,6 +11,9 @@
         <NoWarn>$(NoWarn);1591</NoWarn>
     </PropertyGroup>
     <ItemGroup>
+      <None Remove="Adapters\Kafka\BasketConfirmedService\Contract.proto" />
+    </ItemGroup>
+    <ItemGroup>
         <PackageReference Include="Confluent.Kafka" Version="2.9.0" />
         <PackageReference Include="Dapper" Version="2.1.66" />
         <PackageReference Include="Google.Protobuf" Version="3.30.2" />
@@ -46,5 +49,8 @@
     </ItemGroup>
     <ItemGroup>
       <Folder Include="Adapters\Http\Contract\" />
+    </ItemGroup>
+    <ItemGroup>
+      <Protobuf Include="Adapters\Kafka\BasketConfirmedService\Contract.proto" />
     </ItemGroup>
 </Project>

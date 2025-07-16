@@ -32,7 +32,7 @@ namespace DeliveryApp.Api.Adapters.Http
         {
             var orderId = Guid.NewGuid();
             var street = "Айтишная";
-            var createOrderCommand = new CreateOrderCommand(orderId, street);
+            var createOrderCommand = new CreateOrderCommand(orderId, street, 2);
             var response = await _mediator.Send(createOrderCommand);
             if (response)
                 return Ok();
