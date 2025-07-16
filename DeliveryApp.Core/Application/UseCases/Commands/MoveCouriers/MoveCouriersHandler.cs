@@ -30,6 +30,12 @@ namespace DeliveryApp.Core.Application.UseCases.Commands.MoveCouriers
                     if (order.HasValue)
                     {
                         courier.Move(order.Value.Location);
+                        if (courier.Location == order.Value.Location)
+                        {
+                            order.Value.Complete();
+                            courier.CompleteOrder(order.Value);
+                            _orderRepository.Update(order.Value);
+                        }
                         _courierRepository.Update(courier);
                     }
                 }
