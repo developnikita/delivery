@@ -1,4 +1,6 @@
-﻿using MediatR;
+﻿using DeliveryApp.Infrastructure.Adapters.Postgres.Entities;
+using MediatR;
+using Newtonsoft.Json;
 using Primitives;
 
 namespace DeliveryApp.Infrastructure.Adapters.Postgres
@@ -6,20 +8,18 @@ namespace DeliveryApp.Infrastructure.Adapters.Postgres
     public class UnitOfWork : IUnitOfWork, IDisposable
     {
         private ApplicationDbContext _dbContext;
-        private IMediator _mediator;
 
         private bool _disposed;
 
         public UnitOfWork(ApplicationDbContext dbContext, IMediator mediator)
         {
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
         public async Task<bool> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
+            await SaveDomainEventsInOutboxMessageAsync(cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
-            await PublishDomainEventAsync();
 
             return true;
         }
@@ -30,20 +30,33 @@ namespace DeliveryApp.Infrastructure.Adapters.Postgres
             GC.SuppressFinalize(this);
         }
 
-        private async Task PublishDomainEventAsync()
+        private async Task SaveDomainEventsInOutboxMessageAsync(CancellationToken cancellationToken)
         {
-            var domainEntities = _dbContext.ChangeTracker
+            var outboxMessages = _dbContext.ChangeTracker
                 .Entries<IAggregateRoot>()
-                .Where(x => x.Entity.GetDomainEvents().Any());
+                .Select(e => e.Entity)
+                .SelectMany(aggregate =>
+                {
+                    var domainEvents = aggregate.GetDomainEvents();
 
-            var domainEvents = domainEntities
-                .SelectMany(x => x.Entity.GetDomainEvents())
+                    aggregate.ClearDomainEvents();
+                    return domainEvents;
+                })
+                .Select(domainEvent => new OutboxMessage
+                {
+                    Id = domainEvent.EventId,
+                    Type = domainEvent.GetType().Name,
+                    Payload = JsonConvert.SerializeObject(
+                        domainEvent,
+                        new JsonSerializerSettings
+                        {
+                            TypeNameHandling = TypeNameHandling.All
+                        }),
+                    OccurredAtUtc = DateTime.UtcNow,
+                })
                 .ToList();
 
-            domainEntities.ToList().ForEach(entity => entity.Entity.ClearDomainEvents());
-
-            foreach (var domainEvent in domainEvents)
-                await _mediator.Publish(domainEvent);
+            await _dbContext.Set<OutboxMessage>().AddRangeAsync(outboxMessages, cancellationToken);
         }
 
         private void Dispose(bool disposing)
