@@ -4,7 +4,9 @@ using DeliveryApp.Core.Domain.SharedKernel;
 using DeliveryApp.Infrastructure.Adapters.Postgres;
 using DeliveryApp.Infrastructure.Adapters.Postgres.Repositories;
 using FluentAssertions;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
+using NSubstitute;
 using Testcontainers.PostgreSql;
 using Xunit;
 
@@ -22,6 +24,7 @@ namespace DeliveryApp.IntegrationTests.Adapters.Postgres
 
         private OrderRepository _orderRepository;
         private UnitOfWork _unitOfWork;
+        private IMediator _mediator = Substitute.For<IMediator>();
 
         public OrderRepositoryShould() { }
 
@@ -45,7 +48,7 @@ namespace DeliveryApp.IntegrationTests.Adapters.Postgres
             dbContext.Database.Migrate();
 
             _orderRepository = new OrderRepository(dbContext);
-            _unitOfWork = new UnitOfWork(dbContext);
+            _unitOfWork = new UnitOfWork(dbContext, _mediator);
         }
 
         [Fact]

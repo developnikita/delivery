@@ -1,6 +1,7 @@
 using DeliveryApp.Api;
 using DeliveryApp.Api.Adapters.BackgroundJobs;
 using DeliveryApp.Api.Adapters.Kafka.BasketConfirmedService;
+using DeliveryApp.Core.Application.DomainEventHandlers;
 using DeliveryApp.Core.Application.UseCases.Commands.AssignOrder;
 using DeliveryApp.Core.Application.UseCases.Commands.CreateCourier;
 using DeliveryApp.Core.Application.UseCases.Commands.CreateOrder;
@@ -8,9 +9,11 @@ using DeliveryApp.Core.Application.UseCases.Commands.MoveCouriers;
 using DeliveryApp.Core.Application.UseCases.Queries.GetBusyCouriers;
 using DeliveryApp.Core.Application.UseCases.Queries.GetCouriers;
 using DeliveryApp.Core.Application.UseCases.Queries.GetCreatedAndAssignedOrders;
+using DeliveryApp.Core.Domain.Model.OrderAggregate.DomainEvents;
 using DeliveryApp.Core.Domain.Services.DispatchService;
 using DeliveryApp.Core.Ports;
 using DeliveryApp.Infrastructure.Adapters.Grpc.GeoService;
+using DeliveryApp.Infrastructure.Adapters.Kafka.OrderStatusChanged;
 using DeliveryApp.Infrastructure.Adapters.Postgres;
 using DeliveryApp.Infrastructure.Adapters.Postgres.Repositories;
 using MediatR;
@@ -74,6 +77,9 @@ builder.Services.AddScoped<IRequestHandler<GetBusyCouriersQuery, GetBusyCouriers
 builder.Services.AddScoped<IRequestHandler<GetCouriersQuery, GetCouriersModel>, GetCouriersHandler>(
     _ => new GetCouriersHandler(connectionString));
 
+// DomainEvent
+builder.Services.AddScoped<INotificationHandler<OrderCompletedDomainEvent>, OrderCompletedDomainEventHandler>();
+
 // Grpc
 builder.Services.AddScoped<IGeoClient, Client>();
 
@@ -84,6 +90,9 @@ builder.Services.Configure<HostOptions>(options =>
     options.ShutdownTimeout = TimeSpan.FromSeconds(30);
 });
 builder.Services.AddHostedService<ConsumerService>();
+
+// Kafka Producer
+builder.Services.AddScoped<IMessageBusProducer, Producer>();
 
 // HTTP Handlers
 builder.Services.AddControllers(options => { options.InputFormatters.Insert(0, new InputFormatterStream()); })

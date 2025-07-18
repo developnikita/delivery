@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <None Remove="Adapters\Grpc\GeoService\grpc.proto" />
+      <None Remove="Adapters\Kafka\OrderStatusChanged\Contract.proto" />
     </ItemGroup>
 
     <ItemGroup>
@@ -43,6 +44,7 @@
 
     <ItemGroup>
       <Protobuf Include="Adapters\Grpc\GeoService\grpc.proto" />
+      <Protobuf Include="Adapters\Kafka\OrderStatusChanged\Contract.proto" />
     </ItemGroup>
 
 </Project>
