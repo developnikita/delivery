@@ -11,13 +11,6 @@ namespace DeliveryApp.Infrastructure.Adapters.Postgres.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
-                name: "volume",
-                table: "orders",
-                type: "integer",
-                nullable: false,
-                defaultValue: 0);
-
             migrationBuilder.CreateTable(
                 name: "outbox_message",
                 columns: table => new
